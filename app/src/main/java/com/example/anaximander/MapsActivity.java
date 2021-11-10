@@ -1,9 +1,15 @@
 package com.example.anaximander;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.View;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -16,10 +22,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
+    private FusedLocationProviderClient fusedLocationClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -30,6 +40,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
+//    /**
+//     * Enables the My Location layer if the fine location permission has been granted.
+//     */
+//    private void enableMyLocation(GoogleMap map) {
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+//                == PackageManager.PERMISSION_GRANTED) {
+//            if (map != null) {
+//                map.setMyLocationEnabled(true);
+//            }
+//        } else {
+//            //TODO
+//            // Permission to access the location is missing. Show rationale and request permission
+////            PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST_CODE,
+////                    Manifest.permission.ACCESS_FINE_LOCATION, true);
+//        }
+//    }
 
     /**
      * Manipulates the map once available.
@@ -48,11 +74,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLng(home));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(home, 17.0f));
         mMap.setMapType(2); //https://developers.google.com/android/reference/com/google/android/gms/maps/GoogleMap?hl=en#setMapType(int)
+        //enableMyLocation(mMap);
+
+
 
 
 //        // Add a marker in Sydney and move the camera
 //        LatLng sydney = new LatLng(-34, 151);
 //        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    public void onMapButtonClick(View view){
+        if(view.getId() == R.id.ping_button){
+            mMap.animateCamera(CameraUpdateFactory.zoomIn());
+
+        }
+        if(view.getId() == R.id.zoomIn_button){
+            mMap.animateCamera(CameraUpdateFactory.zoomIn());
+        }
+        if(view.getId() == R.id.zoomOut_button){
+            mMap.animateCamera(CameraUpdateFactory.zoomOut());
+        }
+
     }
 }
