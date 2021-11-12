@@ -34,6 +34,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ActivityMapsBinding binding;
     private double currLat,currLong;
     private LatLng currentLocationLatLng;
+    private int rssi;
 
 
     @Override
@@ -84,11 +85,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     currLong= currentLocation.getLongitude();
                     //Note: Update our currentLocationLatLng variable
                     currentLocationLatLng = new LatLng(currLat, currLong);
+                    //Note: fetch signal strength information
+                    rssi = Utility.getSignalStrength(MapsActivity.this,context);
                     //Note: Add a new marker to the map, and pan camera toward it
-                    mMap.addMarker(new MarkerOptions().position(currentLocationLatLng).title("Current Location"));
+                    mMap.addMarker(new MarkerOptions().position(currentLocationLatLng).title
+                            ("rssi: " + rssi +  "dBm || " + currentLocationLatLng));
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocationLatLng, 18.0f));
                     //Note: Toast to our success
-                    Utility.bakeShortToast("User Located!",context);
+                    Utility.bakeShortToast("Ping Successful" , context);
                 }
             });
 

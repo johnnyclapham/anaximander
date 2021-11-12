@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.wifi.WifiManager;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
@@ -36,6 +37,8 @@ public class Utility extends MapsActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             ActivityCompat.requestPermissions(activity,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.ACCESS_WIFI_STATE}, 1);
             return;
         } else {
             System.out.println("Permissions are already granted. Continuing.");
@@ -66,6 +69,14 @@ public class Utility extends MapsActivity {
         //Note: Toast to our success
         toastLocationSuccess.show();
 
+    }
+
+    public static int getSignalStrength(Activity activity,Context context){
+        CheckPermissionsTest(activity,context);
+        WifiManager manager=(WifiManager)activity.getSystemService(Context.WIFI_SERVICE);
+        //See documentation: https://developer.android.com/reference/android/net/wifi/WifiInfo
+        int rssi = manager.getConnectionInfo().getRssi();
+        return rssi;
     }
 
 }
