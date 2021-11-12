@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -31,7 +32,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
-    private FusedLocationProviderClient fusedLocationClient;
     private double currLat,currLong;
     private LatLng currentLocationLatLng;
 
@@ -39,9 +39,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -73,34 +70,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void onMapButtonClick(View view) {
         if (view.getId() == R.id.ping_button) {
-
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                System.out.println("Permissions are not granted, now requesting permissions.");
-                ActivityCompat.requestPermissions(MapsActivity.this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-                ActivityCompat.requestPermissions(MapsActivity.this,
-                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-                return;
-            } else {
-                System.out.println("Permissions are already granted. Continuing.");
-            }
-
-            //Note: We create a toast in anticipation of our success
-            Toast toastLocationSuccess = Toast.makeText(this, "User Located!", Toast.LENGTH_SHORT);
-
-            //Note: We need a cancellation token for our getCurrentLocation function
-            CancellationTokenSource source = new CancellationTokenSource();
-            CancellationToken token = source.getToken();
-
-            //Note: Create our locationTask that retrieves CURRENT location from our fusedLocationClient
-            Task<Location> locationTask = fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, token);
+            Context context = getApplicationContext();
+            //Note: Create our locationTask that retrieves CURRENT location from a fusedLocationClient
+            Task<Location> locationTask = Utility.startLocationTask(this,context);
             //Note: We have to wait until the task is completed before operating on it
             locationTask.addOnCompleteListener(new OnCompleteListener() {
                 @Override
@@ -110,26 +82,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     //Note: Store results in our current Lat & Long variables
                     currLat = currentLocation.getLatitude();
                     currLong= currentLocation.getLongitude();
-
                     //Note: Update our currentLocationLatLng variable
                     currentLocationLatLng = new LatLng(currLat, currLong);
-
                     //Note: Add a new marker to the map, and pan camera toward it
                     mMap.addMarker(new MarkerOptions().position(currentLocationLatLng).title("Current Location"));
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocationLatLng, 18.0f));
-
                     //Note: Toast to our success
-                    toastLocationSuccess.show();
-
-
+                    Utility.bakeShortToast("User Located!",context);
                 }
             });
 
-        }
-        if(view.getId() == R.id.zoomIn_button){
+        }else if(view.getId() == R.id.zoomIn_button){
             mMap.animateCamera(CameraUpdateFactory.zoomIn());
-        }
-        if(view.getId() == R.id.zoomOut_button){
+        }else if(view.getId() == R.id.zoomOut_button){
             mMap.animateCamera(CameraUpdateFactory.zoomOut());
         }
 
