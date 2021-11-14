@@ -20,6 +20,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.anaximander.databinding.ActivityMapsBinding;
@@ -35,6 +36,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double currLat,currLong;
     private LatLng currentLocationLatLng;
     private int rssi;
+    private MarkerOptions marker;
 
 
     @Override
@@ -70,8 +72,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void onMapButtonClick(View view) {
+        Context context = getApplicationContext();
         if (view.getId() == R.id.ping_button) {
-            Context context = getApplicationContext();
             //Note: Create our locationTask that retrieves CURRENT location from a fusedLocationClient
             Task<Location> locationTask = Utility.startLocationTask(this,context);
             //Note: We have to wait until the task is completed before operating on it
@@ -87,9 +89,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     currentLocationLatLng = new LatLng(currLat, currLong);
                     //Note: fetch signal strength information
                     rssi = Utility.getSignalStrength(MapsActivity.this,context);
+
+                    marker = new MarkerOptions().position(currentLocationLatLng).title
+                            ("rssi: " + rssi +  "dBm || " + currentLocationLatLng);
+                    //marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.user_location));
                     //Note: Add a new marker to the map, and pan camera toward it
-                    mMap.addMarker(new MarkerOptions().position(currentLocationLatLng).title
-                            ("rssi: " + rssi +  "dBm || " + currentLocationLatLng));
+                    mMap.addMarker(marker);
+
+//                    //Note: Add a new marker to the map, and pan camera toward it
+//                    mMap.addMarker(new MarkerOptions().position(currentLocationLatLng).title
+//                            ("rssi: " + rssi +  "dBm || " + currentLocationLatLng));
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocationLatLng, 18.0f));
                     //Note: Toast to our success
                     Utility.bakeShortToast("Ping Successful" , context);
@@ -98,7 +107,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         }else if(view.getId() == R.id.zoomIn_button){
             mMap.animateCamera(CameraUpdateFactory.zoomIn());
-        }else if(view.getId() == R.id.zoomOut_button){
+
+        }else if(view.getId() == R.id.plotAP_button){
+            //Note: Read coords text file & return array of entries
+            String[] coordsArraySet = Utility.readCoordsFile(context);
+
+            int length=coordsArraySet.length;
+
+
+            //Note: Now we have verbose entries for each AP coordinate
+            //      Now, extract the coordinates from each entry &
+            //      make a marker on the map for each
+            //Note: We pass an array twice the size of the verbose array
+            //      This is because there are LatLong pairs for each
+            String[] extractedCoords = new String[length*2];
+            Utility.extractAndPlotCoords(coordsArraySet,extractedCoords,mMap);
+
+        } else if(view.getId() == R.id.zoomOut_button){
             mMap.animateCamera(CameraUpdateFactory.zoomOut());
         }
 

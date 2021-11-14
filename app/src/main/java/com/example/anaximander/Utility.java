@@ -14,9 +14,16 @@ import androidx.core.app.ActivityCompat;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.Task;
+
+
+import java.io.InputStream;
+import java.util.Scanner;
 
 public class Utility extends MapsActivity {
 
@@ -79,4 +86,59 @@ public class Utility extends MapsActivity {
         return rssi;
     }
 
+    public static String[] readCoordsFile(Context context)
+    {
+        String[] coordsArray;
+        //Note: Retrieves text file and converts to string
+        InputStream inputStream = context.getResources().openRawResource(R.raw.coords_clean);
+        Scanner s = new Scanner(inputStream).useDelimiter("\\A");
+        String result = s.hasNext() ? s.next() : "";
+        coordsArray = getCoordsVerbose(result);
+        return coordsArray;
+    }
+
+//    public static Double[] getCoords(String coordsText){
+    public static String[] getCoordsVerbose(String coordsText){
+        int index = 0;
+        String noPara= "";
+        String parsedString=coordsText;
+        String[] parsedCoordsArray;
+
+        //format: (1,1,37.27640915,-76.70839691)
+        parsedString=parsedString.replaceAll("[()]"," ");
+        parsedString=parsedString.replaceAll(" , ","  ");
+        parsedString=parsedString.replaceAll(","," ");
+        parsedCoordsArray = parsedString.split("\\s\\s+");
+
+        return parsedCoordsArray;
+    }
+
+    public static void extractAndPlotCoords(String[] coordsArraySet, String[] extracted,GoogleMap mMap) {
+
+        int longIndex = 0;
+        double APlat, APlong;
+        String subject;
+
+        // iterating over our array
+        for (int index = 0; index < coordsArraySet.length; index++) {
+
+            //Note: Fetch a subject string
+            subject = coordsArraySet[index];
+            //Note: Add first Longitude to position 0
+            extracted[longIndex] = subject.substring(subject.length() - 11, subject.length());
+            //Note: Add first Latitude to position 1
+            extracted[longIndex + 1] = subject.substring(subject.length() - 24, subject.length() - 13);
+            //Note: Fetch and store in string vars
+            String longitude = extracted[longIndex];
+            String latitude = extracted[longIndex + 1];
+            //Note: Convert string values to decimals
+            APlat = Double.parseDouble(latitude);
+            APlong = Double.parseDouble(longitude) * -1;
+            //Note create our latLong obj for map
+            LatLng home = new LatLng(APlat, APlong);
+            //Note: Add the marker for the coord pair
+            mMap.addMarker(new MarkerOptions().position(home).title("AP"));
+            longIndex += 2; //Incriment our index var
+        }
+    }
 }
