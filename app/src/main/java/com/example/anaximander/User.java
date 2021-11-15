@@ -4,17 +4,28 @@ import java.util.Date;
 
 public class User {
     private double latitude,longitude,rssi;
-    private String sys_info;
+    private String sys_info,dateString;
     private Date date;
+
 
     public User(){}
 
-    public User(double latitude, double longitude, double rssi, String sys_info, Date date) {
+    public User(double latitude, double longitude, double rssi, String sys_info, Date date,String dateString) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.rssi = rssi;
         this.sys_info=sys_info;
+        this.date=date;
+        this.dateString=dateString;
 
+    }
+
+    public String getDateString() {
+        return dateString;
+    }
+
+    public void setDateString(String dateString) {
+        this.dateString = dateString;
     }
 
     public Date getDate() {

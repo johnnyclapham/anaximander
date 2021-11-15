@@ -16,6 +16,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.anaximander.databinding.ActivityMapsBinding;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -86,7 +88,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else if(view.getId() == R.id.store_button){
             //Note: Submit out Lat, Long, & rssi to database
             Utility.submit(trioToSubmit,context);
+        } else if(view.getId() == R.id.resetDatabase_button){
+            //Note: get formatted date that we use to identify children to delete
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
+            String format = sdf.format(Calendar.getInstance().getTime());
+            //Note: Delete all entries with today's date
+            Utility.resetDataFromToday(context,format);
         }
 
-    }
+
+}
 }

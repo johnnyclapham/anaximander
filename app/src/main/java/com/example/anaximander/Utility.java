@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.Task;
 
 
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Scanner;
@@ -192,10 +193,17 @@ public class Utility extends MapsActivity {
     }
     public static void submit(double[] trioToSubmit,Context context){
         Date date = Calendar.getInstance().getTime();
+
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DAY_OF_WEEK);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
+        String format = sdf.format(Calendar.getInstance().getTime());
+
         //do something
         DAOUser dao = new DAOUser();
         //Note: Submit our new User data to the database
-        User user = new User(trioToSubmit[0],trioToSubmit[1],trioToSubmit[2],android.os.Build.MODEL, date);
+        User user = new User(trioToSubmit[0],trioToSubmit[1],trioToSubmit[2],android.os.Build.MODEL, date,format);
         //Add with generated key
 //        dao.add(user).addOnSuccessListener(suc ->{
 //            bakeShortToast("Record is inserted",context);
@@ -209,5 +217,12 @@ public class Utility extends MapsActivity {
             bakeShortToast(""+er.getMessage(),context);
         });
 
+    }
+
+    public static void resetDataFromToday(Context context,String mmddyy){
+        //Note: Deletes all data from today format "MM/dd/yy
+        DAOUser dao = new DAOUser();
+        dao.clearAllFirebaseDatafromToday(mmddyy);
+        bakeShortToast("Record is inserted",context);
     }
 }
