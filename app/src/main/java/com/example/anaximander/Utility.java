@@ -26,9 +26,13 @@ import com.google.android.gms.tasks.Task;
 
 
 import java.io.InputStream;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Scanner;
 
 public class Utility extends MapsActivity {
+    //Note: Create our obj for transporting lat, long & rssi
+    private static double[] trioToSubmit = new double[3];
 
 
     public static void CheckPermissionsTest(Activity activity, Context context){
@@ -147,7 +151,7 @@ public class Utility extends MapsActivity {
         }
     }
 
-    public static void fetchAndPlotUserLocation(Context context,Activity act,GoogleMap mMap){
+    public static double[] fetchAndPlotUserData(Context context,Activity act,GoogleMap mMap){
         //Note: Create our locationTask that retrieves CURRENT location from a fusedLocationClient
         Task<Location> locationTask = Utility.startLocationTask(act,context);
         //Note: We have to wait until the task is completed before operating on it
@@ -178,7 +182,32 @@ public class Utility extends MapsActivity {
 
                 //Note: Toast to our success
                 Utility.bakeShortToast("Ping Successful" , context);
+                //Note: Update our lat, long & rssi trio obj
+                trioToSubmit[0]=currLat;
+                trioToSubmit[1]=currLong;
+                trioToSubmit[2]=currentRssi;
             }
         });
+        return(trioToSubmit);
+    }
+    public static void submit(double[] trioToSubmit,Context context){
+        Date date = Calendar.getInstance().getTime();
+        //do something
+        DAOUser dao = new DAOUser();
+        //Note: Submit our new User data to the database
+        User user = new User(trioToSubmit[0],trioToSubmit[1],trioToSubmit[2],android.os.Build.MODEL, date);
+        //Add with generated key
+//        dao.add(user).addOnSuccessListener(suc ->{
+//            bakeShortToast("Record is inserted",context);
+//        }).addOnFailureListener(er->{
+//            bakeShortToast(""+er.getMessage(),context);
+//        });
+        //Add with custom key
+        dao.addWithTimeStampChildName(user,date.toString()).addOnSuccessListener(suc ->{
+            bakeShortToast("Record is inserted",context);
+        }).addOnFailureListener(er->{
+            bakeShortToast(""+er.getMessage(),context);
+        });
+
     }
 }

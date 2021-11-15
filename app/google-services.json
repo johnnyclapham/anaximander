@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "890606455610",
+    "firebase_url": "https://anaximander-default-rtdb.firebaseio.com",
+    "project_id": "anaximander",
+    "storage_bucket": "anaximander.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:890606455610:android:2c9824802bceed23675e03",
+        "android_client_info": {
+          "package_name": "com.wm.anaximander"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "890606455610-3hr9bgu4adishfiq8murfo2oojdu5ggs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5BJbC6NsghAPA_WhDnD5ykf8UJe_J27c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "890606455610-3hr9bgu4adishfiq8murfo2oojdu5ggs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

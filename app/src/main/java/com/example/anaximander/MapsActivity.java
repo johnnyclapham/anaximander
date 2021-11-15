@@ -23,6 +23,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ActivityMapsBinding binding;
     public Activity act;
     private int length;
+    private double[] trioToSubmit;
 
 
     @Override
@@ -61,7 +62,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Context context = getApplicationContext();
         if (view.getId() == R.id.ping_button) {
             act = this;
-            Utility.fetchAndPlotUserLocation(this,act,mMap);
+            //Note: retrieve our Lat,Long, and rssi
+            trioToSubmit=Utility.fetchAndPlotUserData(this,act,mMap);
 
         }else if(view.getId() == R.id.zoomIn_button){
             mMap.animateCamera(CameraUpdateFactory.zoomIn());
@@ -82,7 +84,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else if(view.getId() == R.id.clear_button){
             mMap.clear();
         } else if(view.getId() == R.id.store_button){
-            System.out.println("Button not yet configured.");
+            //Note: Submit out Lat, Long, & rssi to database
+            Utility.submit(trioToSubmit,context);
         }
 
     }
