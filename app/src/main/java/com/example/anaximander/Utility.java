@@ -117,11 +117,12 @@ public class Utility extends MapsActivity {
         return parsedCoordsArray;
     }
 
-    public static void extractAndPlotCoords(String[] coordsArraySet, String[] extracted,GoogleMap mMap) {
+    public static void extractAndPlotCoords(String[] coordsArraySet,GoogleMap mMap) {
 
         int longIndex = 0;
         double APlat, APlong;
         String subject;
+        String[] extractedCoords = new String[coordsArraySet.length*2];
 
         // iterating over our array
         for (int index = 0; index < coordsArraySet.length; index++) {
@@ -129,12 +130,12 @@ public class Utility extends MapsActivity {
             //Note: Fetch a subject string
             subject = coordsArraySet[index];
             //Note: Add first Longitude to position 0
-            extracted[longIndex] = subject.substring(subject.length() - 11, subject.length());
+            extractedCoords[longIndex] = subject.substring(subject.length() - 11, subject.length());
             //Note: Add first Latitude to position 1
-            extracted[longIndex + 1] = subject.substring(subject.length() - 24, subject.length() - 13);
+            extractedCoords[longIndex + 1] = subject.substring(subject.length() - 24, subject.length() - 13);
             //Note: Fetch and store in string vars
-            String longitude = extracted[longIndex];
-            String latitude = extracted[longIndex + 1];
+            String longitude = extractedCoords[longIndex];
+            String latitude = extractedCoords[longIndex + 1];
             //Note: Convert string values to decimals
             APlat = Double.parseDouble(latitude);
             APlong = Double.parseDouble(longitude) * -1;

@@ -66,7 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }else if(view.getId() == R.id.zoomIn_button){
             mMap.animateCamera(CameraUpdateFactory.zoomIn());
 
-        }else if(view.getId() == R.id.plotAP_button){
+        }else if(view.getId() == R.id.plotBuildingCoords_button){
             //Note: Read coords text file & return array of entries
             String[] coordsArraySet = Utility.readCoordsFile(context);
             length=coordsArraySet.length;
@@ -75,11 +75,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //      make a marker on the map for each
             //Note: We pass an array twice the size of the verbose array
             //      This is because there are LatLong pairs for each
-            String[] extractedCoords = new String[length*2];
-            Utility.extractAndPlotCoords(coordsArraySet,extractedCoords,mMap);
+            Utility.extractAndPlotCoords(coordsArraySet,mMap);
 
         } else if(view.getId() == R.id.zoomOut_button){
             mMap.animateCamera(CameraUpdateFactory.zoomOut());
+        } else if(view.getId() == R.id.clear_button){
+            mMap.clear();
+        } else if(view.getId() == R.id.extra_button){
+            System.out.println("Button not yet configured.");
         }
 
     }
