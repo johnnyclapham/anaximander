@@ -81,7 +81,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.animateCamera(CameraUpdateFactory.zoomOut());
         } else if(view.getId() == R.id.clear_button){
             mMap.clear();
-        } else if(view.getId() == R.id.extra_button){
+        } else if(view.getId() == R.id.store_button){
             System.out.println("Button not yet configured.");
         }
 

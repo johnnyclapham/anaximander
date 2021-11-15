@@ -79,12 +79,12 @@
                 android:text="clear"></Button>
 
             <Button
-                android:id="@+id/extra_button"
+                android:id="@+id/store_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="onMapButtonClick"
-                android:text="extra"></Button>
+                android:text="store"></Button>
 
 
         </LinearLayout>
