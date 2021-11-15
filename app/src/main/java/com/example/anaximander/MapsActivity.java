@@ -1,21 +1,13 @@
 package com.example.anaximander;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-
 import androidx.fragment.app.FragmentActivity;
 
-import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.location.Location;
+
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -24,19 +16,13 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.anaximander.databinding.ActivityMapsBinding;
-import com.google.android.gms.tasks.CancellationToken;
-import com.google.android.gms.tasks.CancellationTokenSource;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
+    public GoogleMap mMap;
     private ActivityMapsBinding binding;
-    private double currLat,currLong;
-    private LatLng currentLocationLatLng;
-    private int rssi;
-    private MarkerOptions marker;
+    public Activity act;
+    private int length;
 
 
     @Override
@@ -68,42 +54,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(home).title("Chancellors Hall"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(home));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(home, 17.0f));
-        mMap.setMapType(2); //https://developers.google.com/android/reference/com/google/android/gms/maps/GoogleMap?hl=en#setMapType(int)
+        mMap.setMapType(2); //style
     }
 
     public void onMapButtonClick(View view) {
         Context context = getApplicationContext();
         if (view.getId() == R.id.ping_button) {
-            //Note: Create our locationTask that retrieves CURRENT location from a fusedLocationClient
-            Task<Location> locationTask = Utility.startLocationTask(this,context);
-            //Note: We have to wait until the task is completed before operating on it
-            locationTask.addOnCompleteListener(new OnCompleteListener() {
-                @Override
-                public void onComplete(@NonNull Task task) {
-                    //Note: Retrieve our results
-                    Location currentLocation = (Location) locationTask.getResult();
-                    //Note: Store results in our current Lat & Long variables
-                    currLat = currentLocation.getLatitude();
-                    currLong= currentLocation.getLongitude();
-                    //Note: Update our currentLocationLatLng variable
-                    currentLocationLatLng = new LatLng(currLat, currLong);
-                    //Note: fetch signal strength information
-                    rssi = Utility.getSignalStrength(MapsActivity.this,context);
-
-                    marker = new MarkerOptions().position(currentLocationLatLng).title
-                            ("rssi: " + rssi +  "dBm || " + currentLocationLatLng);
-                    //marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.user_location));
-                    //Note: Add a new marker to the map, and pan camera toward it
-                    mMap.addMarker(marker);
-
-//                    //Note: Add a new marker to the map, and pan camera toward it
-//                    mMap.addMarker(new MarkerOptions().position(currentLocationLatLng).title
-//                            ("rssi: " + rssi +  "dBm || " + currentLocationLatLng));
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocationLatLng, 18.0f));
-                    //Note: Toast to our success
-                    Utility.bakeShortToast("Ping Successful" , context);
-                }
-            });
+            act = this;
+            Utility.fetchAndPlotUserLocation(this,act,mMap);
 
         }else if(view.getId() == R.id.zoomIn_button){
             mMap.animateCamera(CameraUpdateFactory.zoomIn());
@@ -111,11 +69,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }else if(view.getId() == R.id.plotAP_button){
             //Note: Read coords text file & return array of entries
             String[] coordsArraySet = Utility.readCoordsFile(context);
-
-            int length=coordsArraySet.length;
-
-
-            //Note: Now we have verbose entries for each AP coordinate
+            length=coordsArraySet.length;
+            //Note: Now we have verbose entries for each coordinate
             //      Now, extract the coordinates from each entry &
             //      make a marker on the map for each
             //Note: We pass an array twice the size of the verbose array

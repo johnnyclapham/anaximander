@@ -9,16 +9,19 @@ import android.location.Location;
 import android.net.wifi.WifiManager;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.CancellationTokenSource;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 
@@ -26,6 +29,7 @@ import java.io.InputStream;
 import java.util.Scanner;
 
 public class Utility extends MapsActivity {
+
 
     public static void CheckPermissionsTest(Activity activity, Context context){
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -140,5 +144,40 @@ public class Utility extends MapsActivity {
             mMap.addMarker(new MarkerOptions().position(home).title("AP"));
             longIndex += 2; //Incriment our index var
         }
+    }
+
+    public static void fetchAndPlotUserLocation(Context context,Activity act,GoogleMap mMap){
+        //Note: Create our locationTask that retrieves CURRENT location from a fusedLocationClient
+        Task<Location> locationTask = Utility.startLocationTask(act,context);
+        //Note: We have to wait until the task is completed before operating on it
+        locationTask.addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                double currLat,currLong;
+                LatLng currentLocationLatLng;
+                int currentRssi;
+                MarkerOptions marker;
+                //Note: Retrieve our results
+                Location currentLocation = (Location) locationTask.getResult();
+                //Note: Store results in our current Lat & Long variables
+                currLat = currentLocation.getLatitude();
+                currLong= currentLocation.getLongitude();
+                //Note: Update our currentLocationLatLng variable
+                currentLocationLatLng = new LatLng(currLat, currLong);
+                //Note: fetch signal strength information
+                currentRssi = getSignalStrength(act,context);
+
+                //Note: Add a new marker to the map, and pan camera toward it
+                marker = new MarkerOptions().position(currentLocationLatLng).title
+                        ("rssi: " + currentRssi +  "dBm || " + currentLocationLatLng);
+                //marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.user_location));
+                //Note: Add a new marker to the map, and pan camera toward it
+                mMap.addMarker(marker);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocationLatLng, 18.0f));
+
+                //Note: Toast to our success
+                Utility.bakeShortToast("Ping Successful" , context);
+            }
+        });
     }
 }
