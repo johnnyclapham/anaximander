@@ -19,16 +19,19 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
 public class Utility extends MapsActivity {
@@ -122,7 +125,7 @@ public class Utility extends MapsActivity {
         return parsedCoordsArray;
     }
 
-    public static void extractAndPlotCoords(String[] coordsArraySet,GoogleMap mMap) {
+    public static void extractAndPlotCoords(Context context,String[] coordsArraySet,GoogleMap mMap) {
 
         int longIndex = 0;
         double APlat, APlong;
@@ -149,10 +152,19 @@ public class Utility extends MapsActivity {
             //Note: Add the marker for the coord pair
             mMap.addMarker(new MarkerOptions().position(home).title("AP"));
             longIndex += 2; //Incriment our index var
+
+            if (index % 5 == 0){
+                //Note: Using these coords for heatmap testing
+                //So we need to create a user for each of these coords.
+                double randomRssi = -1 * Math.random() * (120 - 30) + 30;
+                randomRssi = Math.floor(randomRssi);
+                submitUserTestBatch(context,APlat,APlong,randomRssi,index);
+            }
+
         }
     }
 
-    public static double[] fetchAndPlotUserData(Context context,Activity act,GoogleMap mMap){
+    public static double[] fetchPlotStoreUserData(Context context,Activity act,GoogleMap mMap){
         //Note: Create our locationTask that retrieves CURRENT location from a fusedLocationClient
         Task<Location> locationTask = Utility.startLocationTask(act,context);
         //Note: We have to wait until the task is completed before operating on it
@@ -187,11 +199,42 @@ public class Utility extends MapsActivity {
                 trioToSubmit[0]=currLat;
                 trioToSubmit[1]=currLong;
                 trioToSubmit[2]=currentRssi;
+                submitUser(context,currLat,currLong,currentRssi);
             }
         });
         return(trioToSubmit);
     }
-    public static void submit(double[] trioToSubmit,Context context){
+
+    public static void submitUser(Context context, double latitude, double longitude, double rssi){
+        Date date = Calendar.getInstance().getTime();
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
+        String format = sdf.format(Calendar.getInstance().getTime());
+        DAOUser dao = new DAOUser();
+        User userForStoring = new User(latitude,longitude,rssi,android.os.Build.MODEL, date,format);
+        dao.addWithTimeStampChildName(userForStoring,date.toString()).addOnSuccessListener(suc ->{
+            bakeShortToast("Record is inserted",context);
+        }).addOnFailureListener(er->{
+            bakeShortToast(""+er.getMessage(),context);
+        });
+    }
+
+    public static void submitUserTestBatch(Context context, double latitude, double longitude, double rssi,int index){
+        Date date = Calendar.getInstance().getTime();
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
+        String format = sdf.format(Calendar.getInstance().getTime());
+        DAOUser dao = new DAOUser();
+        User userForStoring = new User(latitude,longitude,rssi,android.os.Build.MODEL, date,format);
+        dao.addWithTimeStampChildName(userForStoring,Integer.toString(index)).addOnSuccessListener(suc ->{
+            System.out.println("Record is inserted");
+            //bakeShortToast("Record is inserted",context);
+        }).addOnFailureListener(er->{
+            bakeShortToast(""+er.getMessage(),context);
+        });
+    }
+
+    public static void submitPing(double[] trioToSubmit,Context context){
         Date date = Calendar.getInstance().getTime();
 
         Calendar calendar = Calendar.getInstance();
@@ -223,6 +266,31 @@ public class Utility extends MapsActivity {
         //Note: Deletes all data from today format "MM/dd/yy
         DAOUser dao = new DAOUser();
         dao.clearAllFirebaseDatafromToday(mmddyy);
-        bakeShortToast("Record is inserted",context);
+        bakeShortToast("Firebase Destroyed Successfully",context);
+    }
+
+    public static List<LatLng> addHeatMapCoords(Context context, GoogleMap map) {
+        List<LatLng> latLngs;
+
+        // Get the data: latitude/longitude positions of point list.
+        DAOUser dao = new DAOUser();
+        latLngs = dao.getAllFireBaseLatLngs();
+        bakeShortToast("Data to Plot: Updated Successfully",context);
+        return latLngs;
+    }
+
+    public static void drawHeat(List<LatLng> latLngs,GoogleMap map,Context context){
+
+        if (latLngs!=null){
+            // Create a heat map tile provider, passing it the latlngs of the police stations.
+            HeatmapTileProvider provider = new HeatmapTileProvider.Builder()
+                    .data(latLngs)
+                    .build();
+
+            // Add a tile overlay to the map, using the heat map tile provider.
+            TileOverlay overlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(provider));
+        } else {
+            bakeShortToast("No Data to Map!",context);
+        }
     }
 }

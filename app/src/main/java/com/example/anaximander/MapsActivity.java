@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.anaximander.databinding.ActivityMapsBinding;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -26,6 +27,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public Activity act;
     private int length;
     private double[] trioToSubmit;
+    private double latitude, longitude;
+    private List<LatLng> latLngsToPlot;
 
 
     @Override
@@ -65,11 +68,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (view.getId() == R.id.ping_button) {
             act = this;
             //Note: retrieve our Lat,Long, and rssi
-            trioToSubmit=Utility.fetchAndPlotUserData(this,act,mMap);
+            trioToSubmit=Utility.fetchPlotStoreUserData(this,act,mMap);
 
         }else if(view.getId() == R.id.zoomIn_button){
             mMap.animateCamera(CameraUpdateFactory.zoomIn());
+        } else if(view.getId() == R.id.zoomOut_button){
+            mMap.animateCamera(CameraUpdateFactory.zoomOut());
 
+        }else if(view.getId() == R.id.pull_button){
+            // Note: Pull coordinates of all ping Users in Firebase
+            // We will use these coordinates to plot our map
+            latLngsToPlot = Utility.addHeatMapCoords(context,mMap);
+        } else if(view.getId() == R.id.map_button){
+            // Note: Create out heatmap from our pulled User coordinates
+            System.out.println(latLngsToPlot);
+            Utility.drawHeat(latLngsToPlot,mMap,context);
         }else if(view.getId() == R.id.plotBuildingCoords_button){
             //Note: Read coords text file & return array of entries
             String[] coordsArraySet = Utility.readCoordsFile(context);
@@ -79,15 +92,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //      make a marker on the map for each
             //Note: We pass an array twice the size of the verbose array
             //      This is because there are LatLong pairs for each
-            Utility.extractAndPlotCoords(coordsArraySet,mMap);
-
-        } else if(view.getId() == R.id.zoomOut_button){
-            mMap.animateCamera(CameraUpdateFactory.zoomOut());
+            Utility.extractAndPlotCoords(context,coordsArraySet,mMap);
         } else if(view.getId() == R.id.clear_button){
             mMap.clear();
-        } else if(view.getId() == R.id.store_button){
-            //Note: Submit out Lat, Long, & rssi to database
-            Utility.submit(trioToSubmit,context);
+        //} else if(view.getId() == R.id.store_button){
+            //Note: Ping now stores automatically. No need to call this
+            //DEPRECIATED Note: Submit out Lat, Long, & rssi to database
+            //DEPRECIATED Utility.submitPing(trioToSubmit,context);
         } else if(view.getId() == R.id.resetDatabase_button){
             //Note: get formatted date that we use to identify children to delete
             SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
@@ -95,7 +106,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Note: Delete all entries with today's date
             Utility.resetDataFromToday(context,format);
         }
-
-
-}
+    }
 }

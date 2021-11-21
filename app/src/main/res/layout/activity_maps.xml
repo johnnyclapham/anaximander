@@ -30,7 +30,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Ping"
-            android:onClick="onMapButtonClick">
+            android:onClick="onMapButtonClick"
+            android:textSize="11sp">
         </Button>
             <Button
                 android:id="@+id/plotBuildingCoords_button"
@@ -38,7 +39,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="onMapButtonClick"
-                android:text="Plot"></Button>
+                android:text="Plot"
+                android:textSize="11sp"></Button>
         </LinearLayout>
 
         <LinearLayout
@@ -53,7 +55,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="onMapButtonClick"
-                android:text="+"></Button>
+                android:text="Zoom +"
+                android:textSize="11sp"></Button>
 
             <Button
                 android:id="@+id/zoomOut_button"
@@ -61,7 +64,33 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="onMapButtonClick"
-                android:text="-"></Button>
+                android:text="Zoom -"
+                android:textSize="11sp"></Button>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/pull_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="onMapButtonClick"
+                android:text="pull"
+                android:textSize="11sp"></Button>
+
+            <Button
+                android:id="@+id/map_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="onMapButtonClick"
+                android:text="draw"
+                android:textSize="11sp"></Button>
         </LinearLayout>
 
         <LinearLayout
@@ -76,15 +105,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="onMapButtonClick"
-                android:text="clear"></Button>
+                android:text="Clear map screen"
+                android:textSize="11sp"></Button>
 
-            <Button
-                android:id="@+id/store_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="onMapButtonClick"
-                android:text="store"></Button>
+<!--            <Button-->
+<!--                android:id="@+id/store_button"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:onClick="onMapButtonClick"-->
+<!--                android:text="store"></Button>-->
 
 
         </LinearLayout>
@@ -101,7 +131,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="onMapButtonClick"
-                android:text="reset"></Button>
+                android:text="reset data"
+                android:textSize="11sp"></Button>
 
         </LinearLayout>
 
