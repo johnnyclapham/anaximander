@@ -12,6 +12,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.heatmaps.WeightedLatLng;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,8 +55,8 @@ public class DAOUser {
         });
     }
 
-    public List<LatLng> getAllFireBaseLatLngs(){
-        List<LatLng> latLngs = new ArrayList<>();
+    public List<WeightedLatLng> getAllFireBaseLatLngs(){
+        List<WeightedLatLng> WeightedLatLng = new ArrayList<>();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
         Query thirtyQuery = ref.child("User");
         thirtyQuery.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -66,7 +67,8 @@ public class DAOUser {
 
                     double lat = appleSnapshot.child("latitude").getValue(double.class);
                     double lng = appleSnapshot.child("longitude").getValue(double.class);
-                    latLngs.add(new LatLng(lat, lng));
+                    double rssi = appleSnapshot.child("rssi").getValue(double.class);
+                    WeightedLatLng.add(new WeightedLatLng(new LatLng(lat, lng),rssi));
                     //System.out.println(latLngs);
                 }
             }
@@ -76,7 +78,7 @@ public class DAOUser {
                 Log.e(TAG, "onCancelled", databaseError.toException());
             }
         });
-        System.out.println(latLngs);
-        return latLngs;
+        System.out.println(WeightedLatLng);
+        return WeightedLatLng;
     }
 }

@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
+import com.google.maps.android.heatmaps.WeightedLatLng;
 
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -269,8 +270,8 @@ public class Utility extends MapsActivity {
         bakeShortToast("Firebase Destroyed Successfully",context);
     }
 
-    public static List<LatLng> addHeatMapCoords(Context context, GoogleMap map) {
-        List<LatLng> latLngs;
+    public static List<WeightedLatLng> addHeatMapCoords(Context context, GoogleMap map) {
+        List<WeightedLatLng> latLngs;
 
         // Get the data: latitude/longitude positions of point list.
         DAOUser dao = new DAOUser();
@@ -279,12 +280,13 @@ public class Utility extends MapsActivity {
         return latLngs;
     }
 
-    public static void drawHeat(List<LatLng> latLngs,GoogleMap map,Context context){
+    public static void drawHeat(List<WeightedLatLng> WightedLatLngs,GoogleMap map,Context context){
 
-        if (latLngs!=null){
+        if (WightedLatLngs!=null){
+            //System.out.println(WightedLatLngs);
             // Create a heat map tile provider, passing it the latlngs of the police stations.
             HeatmapTileProvider provider = new HeatmapTileProvider.Builder()
-                    .data(latLngs)
+                    .weightedData(WightedLatLngs)
                     .build();
 
             // Add a tile overlay to the map, using the heat map tile provider.

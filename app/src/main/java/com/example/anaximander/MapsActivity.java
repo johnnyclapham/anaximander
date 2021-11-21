@@ -16,6 +16,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.anaximander.databinding.ActivityMapsBinding;
+import com.google.maps.android.heatmaps.WeightedLatLng;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -28,7 +30,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int length;
     private double[] trioToSubmit;
     private double latitude, longitude;
-    private List<LatLng> latLngsToPlot;
+    private List<WeightedLatLng> latLngsToPlot;
 
 
     @Override
