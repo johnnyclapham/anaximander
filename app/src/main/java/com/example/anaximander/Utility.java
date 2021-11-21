@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.wifi.WifiManager;
 import android.widget.Toast;
@@ -25,6 +26,7 @@ import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.maps.android.heatmaps.Gradient;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.google.maps.android.heatmaps.WeightedLatLng;
 
@@ -33,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Utility extends MapsActivity {
@@ -154,13 +157,23 @@ public class Utility extends MapsActivity {
             mMap.addMarker(new MarkerOptions().position(home).title("AP"));
             longIndex += 2; //Incriment our index var
 
-            if (index % 5 == 0){
+            //Note: For less data, take every ith test entry
+            int i = 3;
+            if (index % i == 0){
                 //Note: Using these coords for heatmap testing
                 //So we need to create a user for each of these coords.
-                double randomRssi = -1 * Math.random() * (120 - 30) + 30;
-                randomRssi = Math.floor(randomRssi);
+                //double randomRssi = -1 * Math.random() * (120 - 30) + 30;
+
+                Random r = new Random();
+                int low = 30;
+                int high = 120;
+                int randomRssi = (r.nextInt(high-low) + low) * -1;
+
+                //randomRssi = Math.floor(randomRssi);
                 submitUserTestBatch(context,APlat,APlong,randomRssi,index);
             }
+
+
 
         }
     }
@@ -281,16 +294,38 @@ public class Utility extends MapsActivity {
     }
 
     public static void drawHeat(List<WeightedLatLng> WightedLatLngs,GoogleMap map,Context context){
-
         if (WightedLatLngs!=null){
-            //System.out.println(WightedLatLngs);
-            // Create a heat map tile provider, passing it the latlngs of the police stations.
+            //Note: Please see link:
+            //https://developers.google.com/maps/documentation/android-sdk/utility/heatmap
+            // Create the gradient.
+            //Note: "A gradient is created using two arrays:"
+            //"an integer array containing the colors"
+            int[] colors = {
+                    Color.rgb(255, 0, 0), //red
+                    Color.rgb(255, 164, 0), //orange
+                    Color.rgb(0, 255, 62), //green
+                    Color.rgb(0, 135, 255), //blue
+                    Color.rgb(162, 0, 255) //violet
+            };
+            //"and a float array indicating the starting point for each color"
+            //"given as a percentage of the maximum intensity,"
+            //"and expressed as a fraction from 0 to 1"
+            float[] startPoints = {
+                    0.005f,0.40f,0.7f,0.85f,0.97f
+            };
+            Gradient gradient = new Gradient(colors, startPoints);
+
+            // Create a heat map tile provider, pass it our coords
             HeatmapTileProvider provider = new HeatmapTileProvider.Builder()
                     .weightedData(WightedLatLngs)
+                    .gradient(gradient)
+                    .radius(50)
                     .build();
-
-            // Add a tile overlay to the map, using the heat map tile provider.
-            TileOverlay overlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(provider));
+            provider.setMaxIntensity(1);
+            // Add the tile overlay to the map.
+            TileOverlay tileOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(provider));
+            provider.setOpacity(0.25);
+            tileOverlay.clearTileCache();
         } else {
             bakeShortToast("No Data to Map!",context);
         }

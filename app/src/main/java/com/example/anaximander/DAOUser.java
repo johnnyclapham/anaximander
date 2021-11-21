@@ -67,9 +67,15 @@ public class DAOUser {
 
                     double lat = appleSnapshot.child("latitude").getValue(double.class);
                     double lng = appleSnapshot.child("longitude").getValue(double.class);
-                    double rssi = appleSnapshot.child("rssi").getValue(double.class);
-                    WeightedLatLng.add(new WeightedLatLng(new LatLng(lat, lng),rssi));
-                    //System.out.println(latLngs);
+                    //Note: Make rss positive so we can work more easily with the value
+                    double rssi = -1 * appleSnapshot.child("rssi").getValue(double.class);
+                    //Note: Normalize rss (30 to 120) to a (0 to 1) scale
+                    double rssiNormalized = (rssi-29)/(120-29);
+                    //Note: For our map, we must invert for visuals to make sense
+                    //      30 should be strongest, 120 should be weakest
+                    //      (remember we are 0-1 scale now)
+                    double invertedRssiNormalized = 1-rssiNormalized;
+                    WeightedLatLng.add(new WeightedLatLng(new LatLng(lat, lng),invertedRssiNormalized));
                 }
             }
 
