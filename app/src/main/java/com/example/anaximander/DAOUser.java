@@ -35,6 +35,11 @@ public class DAOUser {
         return databaseReference.child(child).setValue(user);
     }
 
+    public Task<Void> addWithLatLngName(User user, String child) {
+
+        return databaseReference.child(child).setValue(user);
+    }
+
     public void clearAllFirebaseDatafromToday(String mmddyy) {
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();

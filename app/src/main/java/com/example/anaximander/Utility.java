@@ -213,24 +213,53 @@ public class Utility extends MapsActivity {
                 trioToSubmit[0]=currLat;
                 trioToSubmit[1]=currLong;
                 trioToSubmit[2]=currentRssi;
-                submitUser(context,currLat,currLong,currentRssi);
+                submitUserLATLONGTitle(context,currLat,currLong,currentRssi);
             }
         });
         return(trioToSubmit);
     }
-
-    public static void submitUser(Context context, double latitude, double longitude, double rssi){
+    public static void submitUserLATLONGTitle(Context context, double latitude, double longitude, double rssi){
         Date date = Calendar.getInstance().getTime();
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
         String format = sdf.format(Calendar.getInstance().getTime());
         DAOUser dao = new DAOUser();
         User userForStoring = new User(latitude,longitude,rssi,android.os.Build.MODEL, date,format);
-        dao.addWithTimeStampChildName(userForStoring,date.toString()).addOnSuccessListener(suc ->{
+        String childTitle = date.toString();
+
+        int intPartLAT = (int) latitude;
+        int intPartLONG = (int) longitude;
+        Double floatingPartLAT = latitude-intPartLAT;
+        Double floatingPartLONG = latitude-intPartLONG;
+        String floatingPartAsStringLAT = String.valueOf(floatingPartLAT);
+        String floatingPartAsStringLONG = String.valueOf(floatingPartLONG);
+        int indexOfDecimalLAT = floatingPartAsStringLAT.indexOf(".");
+        int indexOfDecimalLONG = floatingPartAsStringLONG.indexOf(".");
+        String childTitleLAT = floatingPartAsStringLAT.substring(indexOfDecimalLAT+1,indexOfDecimalLAT+6);
+        String childTitleLONG = floatingPartAsStringLONG.substring(indexOfDecimalLONG+1,indexOfDecimalLONG+6);
+        String childTitleLATLONG = childTitleLAT + childTitleLONG;
+        //String childTitleLATLONG = childTitleLONG;
+
+        dao.addWithLatLngName(userForStoring,childTitleLATLONG).addOnSuccessListener(suc ->{
             bakeShortToast("Record is inserted",context);
         }).addOnFailureListener(er->{
             bakeShortToast(""+er.getMessage(),context);
         });
+    }
+    public static void submitUserDateTitle(Context context, double latitude, double longitude, double rssi){
+        Date date = Calendar.getInstance().getTime();
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
+        String format = sdf.format(Calendar.getInstance().getTime());
+        DAOUser dao = new DAOUser();
+        User userForStoring = new User(latitude,longitude,rssi,android.os.Build.MODEL, date,format);
+        String childTitle = date.toString();
+        dao.addWithTimeStampChildName(userForStoring,childTitle).addOnSuccessListener(suc ->{
+            bakeShortToast("Record is inserted",context);
+        }).addOnFailureListener(er->{
+            bakeShortToast(""+er.getMessage(),context);
+        });
+
     }
 
     public static void submitUserTestBatch(Context context, double latitude, double longitude, double rssi,int index){
