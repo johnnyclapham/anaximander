@@ -230,7 +230,7 @@ public class Utility extends MapsActivity {
         int intPartLAT = (int) latitude;
         int intPartLONG = (int) longitude;
         Double floatingPartLAT = latitude-intPartLAT;
-        Double floatingPartLONG = latitude-intPartLONG;
+        Double floatingPartLONG = longitude-intPartLONG;
         String floatingPartAsStringLAT = String.valueOf(floatingPartLAT);
         String floatingPartAsStringLONG = String.valueOf(floatingPartLONG);
         int indexOfDecimalLAT = floatingPartAsStringLAT.indexOf(".");
