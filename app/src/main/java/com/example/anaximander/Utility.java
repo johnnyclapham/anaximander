@@ -179,6 +179,8 @@ public class Utility extends MapsActivity {
     }
 
     public static double[] fetchPlotStoreUserData(Context context,Activity act,GoogleMap mMap){
+        // This is our concept location for improving location accuracy
+
         //Note: Create our locationTask that retrieves CURRENT location from a fusedLocationClient
         Task<Location> locationTask = Utility.startLocationTask(act,context);
         //Note: We have to wait until the task is completed before operating on it
