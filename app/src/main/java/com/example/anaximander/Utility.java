@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.wifi.WifiManager;
 import android.widget.Toast;
 
@@ -43,7 +45,7 @@ public class Utility extends MapsActivity {
     private static double[] trioToSubmit = new double[3];
 
 
-    public static void CheckPermissionsTest(Activity activity, Context context){
+    public static void CheckPermissionsTest(Activity activity, Context context) {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -69,24 +71,24 @@ public class Utility extends MapsActivity {
 
     }
 
-    public static CancellationToken getToken(){
+    public static CancellationToken getToken() {
         //Note: We need a cancellation token for our getCurrentLocation function
         CancellationTokenSource source = new CancellationTokenSource();
         CancellationToken token = source.getToken();
-        return(token);
+        return (token);
     }
 
-    public static Task<Location> startLocationTask(Activity activity, Context context){
+    public static Task<Location> startLocationTask(Activity activity, Context context) {
         //Note: We need a cancellation token for our getCurrentLocation function
         CancellationToken token = getToken();
         FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(activity);
         //Note: Create our locationTask that retrieves CURRENT location from our fusedLocationClient
-        CheckPermissionsTest(activity,context);
+        CheckPermissionsTest(activity, context);
         @SuppressLint("MissingPermission") Task<Location> locationTask = client.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, token);
         return locationTask;
     }
 
-    public static void bakeShortToast(String toastText,Context context){
+    public static void bakeShortToast(String toastText, Context context) {
         //Note: We create a toast in anticipation of our success
         Toast toastLocationSuccess = Toast.makeText(context, toastText, Toast.LENGTH_SHORT);
         //Note: Toast to our success
@@ -94,16 +96,15 @@ public class Utility extends MapsActivity {
 
     }
 
-    public static int getSignalStrength(Activity activity,Context context){
-        CheckPermissionsTest(activity,context);
-        WifiManager manager=(WifiManager)activity.getSystemService(Context.WIFI_SERVICE);
+    public static int getSignalStrength(Activity activity, Context context) {
+        CheckPermissionsTest(activity, context);
+        WifiManager manager = (WifiManager) activity.getSystemService(Context.WIFI_SERVICE);
         //See documentation: https://developer.android.com/reference/android/net/wifi/WifiInfo
         int rssi = manager.getConnectionInfo().getRssi();
         return rssi;
     }
 
-    public static String[] readCoordsFile(Context context)
-    {
+    public static String[] readCoordsFile(Context context) {
         String[] coordsArray;
         //Note: Retrieves text file and converts to string
         InputStream inputStream = context.getResources().openRawResource(R.raw.coords_clean);
@@ -113,28 +114,28 @@ public class Utility extends MapsActivity {
         return coordsArray;
     }
 
-//    public static Double[] getCoords(String coordsText){
-    public static String[] getCoordsVerbose(String coordsText){
+    //    public static Double[] getCoords(String coordsText){
+    public static String[] getCoordsVerbose(String coordsText) {
         int index = 0;
-        String noPara= "";
-        String parsedString=coordsText;
+        String noPara = "";
+        String parsedString = coordsText;
         String[] parsedCoordsArray;
 
         //format: (1,1,37.27640915,-76.70839691)
-        parsedString=parsedString.replaceAll("[()]"," ");
-        parsedString=parsedString.replaceAll(" , ","  ");
-        parsedString=parsedString.replaceAll(","," ");
+        parsedString = parsedString.replaceAll("[()]", " ");
+        parsedString = parsedString.replaceAll(" , ", "  ");
+        parsedString = parsedString.replaceAll(",", " ");
         parsedCoordsArray = parsedString.split("\\s\\s+");
 
         return parsedCoordsArray;
     }
 
-    public static void extractAndPlotCoords(Context context,String[] coordsArraySet,GoogleMap mMap) {
+    public static void extractAndPlotCoords(Context context, String[] coordsArraySet, GoogleMap mMap) {
 
         int longIndex = 0;
         double APlat, APlong;
         String subject;
-        String[] extractedCoords = new String[coordsArraySet.length*2];
+        String[] extractedCoords = new String[coordsArraySet.length * 2];
 
         // iterating over our array
         for (int index = 0; index < coordsArraySet.length; index++) {
@@ -159,7 +160,7 @@ public class Utility extends MapsActivity {
 
             //Note: For less data, take every ith test entry
             int i = 3;
-            if (index % i == 0){
+            if (index % i == 0) {
                 //Note: Using these coords for heatmap testing
                 //So we need to create a user for each of these coords.
                 //double randomRssi = -1 * Math.random() * (120 - 30) + 30;
@@ -167,19 +168,29 @@ public class Utility extends MapsActivity {
                 Random r = new Random();
                 int low = 30;
                 int high = 120;
-                int randomRssi = (r.nextInt(high-low) + low) * -1;
+                int randomRssi = (r.nextInt(high - low) + low) * -1;
 
                 //randomRssi = Math.floor(randomRssi);
-                submitUserTestBatch(context,APlat,APlong,randomRssi,index);
+                submitUserTestBatch(context, APlat, APlong, randomRssi, index);
             }
-
 
 
         }
     }
 
-    public static double[] fetchPlotStoreUserData(Context context,Activity act,GoogleMap mMap){
+    public static <locationManager> double[] fetchPlotStoreUserData(Context context, Activity act, GoogleMap mMap, LocationManager locationManager) {
         // This is our concept location for improving location accuracy
+
+//        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//        CheckPermissionsTest(act, context);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            CheckPermissionsTest(act, context);
+        }
+        Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//        Location locationNETWORK = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
         //Note: Create our locationTask that retrieves CURRENT location from a fusedLocationClient
         Task<Location> locationTask = Utility.startLocationTask(act,context);
@@ -194,8 +205,19 @@ public class Utility extends MapsActivity {
                 //Note: Retrieve our results
                 Location currentLocation = (Location) locationTask.getResult();
                 //Note: Store results in our current Lat & Long variables
-                currLat = currentLocation.getLatitude();
-                currLong= currentLocation.getLongitude();
+
+                //Note: We have three different methods of getting locations
+                // https://stackoverflow.com/questions/6775257/android-location-providers-gps-or-network-provider
+                // From my testing, GPS is the most accurate and we are using that
+
+//                currLat = currentLocation.getLatitude();
+                currLat = locationGPS.getLatitude();
+//                currLat = locationNETWORK.getLatitude();
+
+//                currLong= currentLocation.getLongitude();
+                currLong= locationGPS.getLongitude();
+//                currLong= locationNETWORK.getLongitude();
+
                 //Note: Update our currentLocationLatLng variable
                 currentLocationLatLng = new LatLng(currLat, currLong);
                 //Note: fetch signal strength information

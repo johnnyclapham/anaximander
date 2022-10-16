@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentActivity;
 import android.app.Activity;
 import android.content.Context;
 
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 
@@ -70,7 +71,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (view.getId() == R.id.ping_button) {
             act = this;
             //Note: retrieve our Lat,Long, and rssi
-            trioToSubmit=Utility.fetchPlotStoreUserData(this,act,mMap);
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            trioToSubmit=Utility.fetchPlotStoreUserData(this,act,mMap,locationManager);
 
         }else if(view.getId() == R.id.zoomIn_button){
             mMap.animateCamera(CameraUpdateFactory.zoomIn());
