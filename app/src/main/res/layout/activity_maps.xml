@@ -5,14 +5,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:ignore="SmallSp">
 
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="412dp"
-        android:layout_height="656dp"
+        android:layout_height="415dp"
         tools:context=".MapsActivity" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="15pt">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/rssiTextView"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:text="RSSI:\n           0dBm"
+                android:textColor="@color/black"
+                ></TextView>
+
+        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,49 +45,28 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical">
-        <Button
-            android:id="@+id/ping_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Ping"
-            android:onClick="onMapButtonClick"
-            android:textSize="11sp">
-        </Button>
+
+            <Button
+                android:id="@+id/ping_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="onMapButtonClick"
+                android:text="Ping\npoint"
+                android:textSize="11sp"
+                tools:ignore="TouchTargetSizeCheck"></Button>
+
             <Button
                 android:id="@+id/plotBuildingCoords_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="onMapButtonClick"
-                android:text="Plot"
-                android:textSize="11sp"></Button>
+                android:text="Plot\npoints"
+                android:textSize="11sp"
+                tools:ignore="TouchTargetSizeCheck"></Button>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <Button
-                android:id="@+id/zoomIn_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="onMapButtonClick"
-                android:text="Zoom +"
-                android:textSize="11sp"></Button>
-
-            <Button
-                android:id="@+id/zoomOut_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="onMapButtonClick"
-                android:text="Zoom -"
-                android:textSize="11sp"></Button>
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -80,50 +80,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="onMapButtonClick"
-                android:text="pull"
-                android:textSize="11sp"></Button>
-
-            <Button
-                android:id="@+id/map_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="onMapButtonClick"
-                android:text="draw"
-                android:textSize="11sp"></Button>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <Button
-                android:id="@+id/clear_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="onMapButtonClick"
-                android:text="Clear map screen"
-                android:textSize="11sp"></Button>
-
-<!--            <Button-->
-<!--                android:id="@+id/store_button"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_weight="1"-->
-<!--                android:onClick="onMapButtonClick"-->
-<!--                android:text="store"></Button>-->
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
+                android:text="pull data points"
+                android:textSize="11sp"
+                tools:ignore="TouchTargetSizeCheck"></Button>
 
             <Button
                 android:id="@+id/resetDatabase_button"
@@ -132,11 +91,74 @@
                 android:layout_weight="1"
                 android:onClick="onMapButtonClick"
                 android:text="reset data"
-                android:textSize="11sp"></Button>
+                android:textSize="11sp"
+                tools:ignore="TouchTargetSizeCheck"></Button>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+
+            <Button
+                android:id="@+id/map_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="onMapButtonClick"
+                android:text="visualize"
+                android:textSize="11sp"
+                tools:ignore="TouchTargetSizeCheck"></Button>
+
+            <Button
+                android:id="@+id/clear_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="onMapButtonClick"
+                android:text="RESET MAP"
+                android:textSize="11sp"
+                tools:ignore="TouchTargetSizeCheck"></Button>
+
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+
+            <Button
+                android:id="@+id/zoomIn_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="onMapButtonClick"
+                android:text="Zoom +"
+                android:textSize="11sp"
+                tools:ignore="TouchTargetSizeCheck"></Button>
+
+            <Button
+                android:id="@+id/zoomOut_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="onMapButtonClick"
+                android:text="Zoom -"
+                android:textSize="11sp"
+                tools:ignore="TouchTargetSizeCheck"></Button>
+
+        </LinearLayout>
+
+
+
     </LinearLayout>
+
+
 
 
 </LinearLayout>

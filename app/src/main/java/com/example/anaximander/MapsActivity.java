@@ -8,6 +8,7 @@ import android.content.Context;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,10 +33,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double[] trioToSubmit;
     private double latitude, longitude;
     private List<WeightedLatLng> latLngsToPlot;
+//    TextView rssiTextView = (TextView) findViewById(R.id.rssiTextView);
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        TextView rssiTextView = (TextView) findViewById(R.id.rssiTextView);
         super.onCreate(savedInstanceState);
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -44,6 +47,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+//        TextView rssiTextView = findViewById(R.id.rssiTextView);
+//        int signalStrength = Utility.getSignalStrength(this, this);
+//        rssiTextView.setText("RSSI:\\n           "+signalStrength+"dBm");
+
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                //Note: update the textview
+//                TextView rssiTextView = findViewById(R.id.rssiTextView);
+//                int signalStrength = Utility.getSignalStrength(act, context);
+//                rssiTextView.setText("RSSI:\\n           "+signalStrength+"dBm");
+//            }
+//        });
+
     }
 
 
@@ -72,7 +90,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             act = this;
             //Note: retrieve our Lat,Long, and rssi
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            trioToSubmit=Utility.fetchPlotStoreUserData(this,act,mMap,locationManager);
+            trioToSubmit=Utility.fetchPlotStoreUserData(context,act,mMap,locationManager);
+
+            //Note: update the textview
+            TextView rssiTextView = findViewById(R.id.rssiTextView);
+            int signalStrength = Utility.getSignalStrength(act, context);
+            rssiTextView.setText("RSSI:\n           "+signalStrength+"dBm");
 
         }else if(view.getId() == R.id.zoomIn_button){
             mMap.animateCamera(CameraUpdateFactory.zoomIn());
@@ -110,5 +133,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Note: Delete all entries with today's date
             Utility.resetDataFromToday(context,format);
         }
+
+
     }
 }

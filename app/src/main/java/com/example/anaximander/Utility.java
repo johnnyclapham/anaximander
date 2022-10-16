@@ -10,6 +10,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.wifi.WifiManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -101,6 +102,11 @@ public class Utility extends MapsActivity {
         WifiManager manager = (WifiManager) activity.getSystemService(Context.WIFI_SERVICE);
         //See documentation: https://developer.android.com/reference/android/net/wifi/WifiInfo
         int rssi = manager.getConnectionInfo().getRssi();
+
+//        TextView rssiTextView = (TextView) findViewById(R.id.rssiTextView);
+//        int signalStrength = Utility.getSignalStrength(this, this);
+//        rssiTextView.setText("RSSI:\\n           "+rssi+"dBm");
+
         return rssi;
     }
 
@@ -264,6 +270,8 @@ public class Utility extends MapsActivity {
         String childTitleLATLONG = childTitleLAT + childTitleLONG;
         //String childTitleLATLONG = childTitleLONG;
 
+        // Note: since the name of the record is the LATLONG, any duplicates will overwrite the
+        // last entry.
         dao.addWithLatLngName(userForStoring,childTitleLATLONG).addOnSuccessListener(suc ->{
             bakeShortToast("Record is inserted",context);
         }).addOnFailureListener(er->{
