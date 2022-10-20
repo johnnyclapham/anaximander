@@ -392,7 +392,7 @@ public class Utility extends MapsActivity {
 
     public static void resetDataFromToday(Context context,String mmddyy){
         //Note: Deletes all data from today format "MM/dd/yy
-//        mmddyy = "11/24/21";
+//        mmddyy = "12/09/21";
         DAOUser dao = new DAOUser();
         dao.clearAllFirebaseDatafromToday(mmddyy);
         bakeShortToast("Firebase Destroyed Successfully",context);

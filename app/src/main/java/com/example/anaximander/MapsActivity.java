@@ -9,9 +9,12 @@ import android.content.Context;
 
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -30,8 +33,13 @@ import com.google.maps.android.heatmaps.WeightedLatLng;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+    private int passiveFlag = 0;
 
     public GoogleMap mMap;
     private ActivityMapsBinding binding;
@@ -42,6 +50,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private List<WeightedLatLng> latLngsToPlot;
 //    TextView rssiTextView = (TextView) findViewById(R.id.rssiTextView);
     private FusedLocationProviderClient fusedLocationClient;
+    private Runnable runnable;
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private Future longRunningTaskFuture;
+    private int stopFlag;
+    private Handler handler = new Handler();
+
+
 
 
 
@@ -89,8 +104,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     public void onMapButtonClick(View view) {
+//        int passiveFlag = 0;
         Context context = getApplicationContext();
         if (view.getId() == R.id.ping_button) {
+
             act = this;
             //Note: retrieve our Lat,Long, and rssi
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -101,8 +118,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Note: update the textview
             TextView rssiTextView = findViewById(R.id.rssiTextView);
             int signalStrength = Utility.getSignalStrength(act, context);
-            rssiTextView.setText("RSSI:\n           "+signalStrength+"dBm");
+            rssiTextView.setText("RSSI: "+signalStrength+"dBm");
 
+        }else if(view.getId() == R.id.passive_ping_button){
+            if(passiveFlag==0){
+//                passiveFlag=1;
+//                Handler handler = new Handler();
+                runnable = new Runnable() {
+                    @Override
+                    public void run() {
+//                        while(1==1){
+//                        for(int i=0;i<100;i++){
+                        // repeat every 2 seconds
+                        handler.postDelayed(runnable, 2*1000);
+                        act = MapsActivity.this;
+                        //Note: retrieve our Lat,Long, and rssi
+                        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                        //            trioToSubmit=Utility.fetchPlotStoreUserData(context,act,mMap,locationManager);
+                        trioToSubmit=Utility.fetchPlotStoreUserDataNew(context,act,mMap,locationManager);
+                        //Note: update the textview
+                        TextView rssiTextView = findViewById(R.id.rssiTextView);
+                        int signalStrength = Utility.getSignalStrength(act, context);
+                        rssiTextView.setText("RSSI: "+signalStrength+"dBm");
+                        Button passive_button = (Button)findViewById(R.id.passive_ping_button);
+                        passive_button.setText("Passive Ping Enabled");
+                        passive_button.setBackgroundColor(getResources().getColor(R.color.green));
+
+                    }
+                };
+                runnable.run();
+                longRunningTaskFuture = executorService.submit(runnable);
+
+
+
+            }
+//            act = this;
+//            //Note: retrieve our Lat,Long, and rssi
+//            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+////            trioToSubmit=Utility.fetchPlotStoreUserData(context,act,mMap,locationManager);
+//            trioToSubmit=Utility.fetchPlotStoreUserDataNew(context,act,mMap,locationManager);
+//            //Note: update the textview
+//            TextView rssiTextView = findViewById(R.id.rssiTextView);
+//            int signalStrength = Utility.getSignalStrength(act, context);
+//            rssiTextView.setText("RSSI:\n           "+signalStrength+"dBm");
+//            Button passive_button = (Button)findViewById(R.id.passive_ping_button);
+//            passive_button.setText("Passive Ping Enabled");
+//            passive_button.setBackgroundColor(getResources().getColor(R.color.green));
         }else if(view.getId() == R.id.zoomIn_button){
             mMap.animateCamera(CameraUpdateFactory.zoomIn());
         } else if(view.getId() == R.id.zoomOut_button){
