@@ -28,7 +28,14 @@
                 android:id="@+id/rssiTextView"
                 android:layout_width="1in"
                 android:layout_height="wrap_content"
-                android:text="RSSI: 0dBm  "
+                android:text="RSSI: N/A  "
+                android:textColor="@color/black"
+                ></TextView>
+            <TextView
+                android:id="@+id/locationAccuracyTextView"
+                android:layout_width="1in"
+                android:layout_height="wrap_content"
+                android:text="Accuracy: N/A "
                 android:textColor="@color/black"
                 ></TextView>
             <Button

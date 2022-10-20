@@ -45,7 +45,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ActivityMapsBinding binding;
     public Activity act;
     private int length;
-    private double[] trioToSubmit;
+    private double[] itemsToSubmit;
     private double latitude, longitude;
     private List<WeightedLatLng> latLngsToPlot;
 //    TextView rssiTextView = (TextView) findViewById(R.id.rssiTextView);
@@ -110,9 +110,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             act = this;
             //Note: retrieve our Lat,Long, and rssi
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//            trioToSubmit=Utility.fetchPlotStoreUserData(context,act,mMap,locationManager);
-            trioToSubmit=Utility.fetchPlotStoreUserDataNew(context,act,mMap,locationManager);
+            // Method 1: use locationManager. This is not recommeded by community.
+//            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//            itemsToSubmit=Utility.fetchPlotStoreUserData_LocationManager(context,act,mMap,locationManager);
+            // Method 2: use fusedLocationClient. This is recommended by community.
+            // Although, we are having difficulties with accuracy of this method.
+            itemsToSubmit=Utility.fetchPlotStoreUserData_Fused(context,act,mMap);
 
 
             //Note: update the textview
@@ -120,22 +123,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             int signalStrength = Utility.getSignalStrength(act, context);
             rssiTextView.setText("RSSI: "+signalStrength+"dBm");
 
+            //Note: update the location accuracy
+            TextView locationAccuracyTextView = findViewById(R.id.locationAccuracyTextView);
+
+            locationAccuracyTextView.setText("Location Accuracy: "+ (int) itemsToSubmit[3]);
+
+
+
         }else if(view.getId() == R.id.passive_ping_button){
             if(passiveFlag==0){
-//                passiveFlag=1;
-//                Handler handler = new Handler();
                 runnable = new Runnable() {
                     @Override
                     public void run() {
-//                        while(1==1){
-//                        for(int i=0;i<100;i++){
                         // repeat every 2 seconds
                         handler.postDelayed(runnable, 2*1000);
                         act = MapsActivity.this;
                         //Note: retrieve our Lat,Long, and rssi
-                        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                        //            trioToSubmit=Utility.fetchPlotStoreUserData(context,act,mMap,locationManager);
-                        trioToSubmit=Utility.fetchPlotStoreUserDataNew(context,act,mMap,locationManager);
+                        // Method 1: use locationManager. This is not recommeded by community.
+//                        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//                        itemsToSubmit=Utility.fetchPlotStoreUserData_LocationManager(context,act,mMap,locationManager);
+                        // Method 2: use fusedLocationClient. This is recommended by community.
+                        // Although, we are having difficulties with accuracy of this method.
+                        itemsToSubmit=Utility.fetchPlotStoreUserData_Fused(context,act,mMap);
+
+
                         //Note: update the textview
                         TextView rssiTextView = findViewById(R.id.rssiTextView);
                         int signalStrength = Utility.getSignalStrength(act, context);
@@ -144,26 +155,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         passive_button.setText("Passive Ping Enabled");
                         passive_button.setBackgroundColor(getResources().getColor(R.color.green));
 
+                        //Note: update the location accuracy
+                        TextView locationAccuracyTextView = findViewById(R.id.locationAccuracyTextView);
+                        locationAccuracyTextView.setText("Location Accuracy: "+ (int) itemsToSubmit[3]);
                     }
                 };
                 runnable.run();
                 longRunningTaskFuture = executorService.submit(runnable);
 
-
-
             }
-//            act = this;
-//            //Note: retrieve our Lat,Long, and rssi
-//            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-////            trioToSubmit=Utility.fetchPlotStoreUserData(context,act,mMap,locationManager);
-//            trioToSubmit=Utility.fetchPlotStoreUserDataNew(context,act,mMap,locationManager);
-//            //Note: update the textview
-//            TextView rssiTextView = findViewById(R.id.rssiTextView);
-//            int signalStrength = Utility.getSignalStrength(act, context);
-//            rssiTextView.setText("RSSI:\n           "+signalStrength+"dBm");
-//            Button passive_button = (Button)findViewById(R.id.passive_ping_button);
-//            passive_button.setText("Passive Ping Enabled");
-//            passive_button.setBackgroundColor(getResources().getColor(R.color.green));
         }else if(view.getId() == R.id.zoomIn_button){
             mMap.animateCamera(CameraUpdateFactory.zoomIn());
         } else if(view.getId() == R.id.zoomOut_button){
@@ -192,7 +192,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //} else if(view.getId() == R.id.store_button){
             //Note: Ping now stores automatically. No need to call this
             //DEPRECIATED Note: Submit out Lat, Long, & rssi to database
-            //DEPRECIATED Utility.submitPing(trioToSubmit,context);
+            //DEPRECIATED Utility.submitPing(itemsToSubmit,context);
         } else if(view.getId() == R.id.resetDatabase_button){
             //Note: get formatted date that we use to identify children to delete
             SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
