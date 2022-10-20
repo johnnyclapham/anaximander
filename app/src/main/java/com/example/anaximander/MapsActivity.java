@@ -1,15 +1,22 @@
 package com.example.anaximander;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 
+import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -34,6 +41,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double latitude, longitude;
     private List<WeightedLatLng> latLngsToPlot;
 //    TextView rssiTextView = (TextView) findViewById(R.id.rssiTextView);
+    private FusedLocationProviderClient fusedLocationClient;
+
 
 
     @Override
@@ -48,19 +57,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-//        TextView rssiTextView = findViewById(R.id.rssiTextView);
-//        int signalStrength = Utility.getSignalStrength(this, this);
-//        rssiTextView.setText("RSSI:\\n           "+signalStrength+"dBm");
+//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                //Note: update the textview
-//                TextView rssiTextView = findViewById(R.id.rssiTextView);
-//                int signalStrength = Utility.getSignalStrength(act, context);
-//                rssiTextView.setText("RSSI:\\n           "+signalStrength+"dBm");
-//            }
-//        });
+
 
     }
 
@@ -82,7 +81,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLng(home));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(home, 17.0f));
         mMap.setMapType(2); //style
+
+        //new
+
     }
+
+
 
     public void onMapButtonClick(View view) {
         Context context = getApplicationContext();
@@ -90,7 +94,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             act = this;
             //Note: retrieve our Lat,Long, and rssi
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            trioToSubmit=Utility.fetchPlotStoreUserData(context,act,mMap,locationManager);
+//            trioToSubmit=Utility.fetchPlotStoreUserData(context,act,mMap,locationManager);
+            trioToSubmit=Utility.fetchPlotStoreUserDataNew(context,act,mMap,locationManager);
+
 
             //Note: update the textview
             TextView rssiTextView = findViewById(R.id.rssiTextView);

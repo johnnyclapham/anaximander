@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.maps.android.heatmaps.Gradient;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
@@ -196,7 +197,7 @@ public class Utility extends MapsActivity {
             CheckPermissionsTest(act, context);
         }
         Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//        Location locationNETWORK = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        Location locationNETWORK = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
         //Note: Create our locationTask that retrieves CURRENT location from a fusedLocationClient
         Task<Location> locationTask = Utility.startLocationTask(act,context);
@@ -248,6 +249,58 @@ public class Utility extends MapsActivity {
         });
         return(trioToSubmit);
     }
+
+    //Note: this method is more accurate than the above method
+    public static <locationManager> double[] fetchPlotStoreUserDataNew(Context context, Activity act, GoogleMap mMap, LocationManager locationManager) {
+        // This is our concept location for improving location accuracy
+
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(act);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            CheckPermissionsTest(act, context);}
+
+        CancellationTokenSource cancelToken = new CancellationTokenSource();
+        fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,cancelToken.getToken()).addOnSuccessListener(
+                new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+                            System.out.println("Location: " + location);
+                            double currLat = location.getLatitude();
+                            double currLong = location.getLongitude();
+
+                            //Note: Update our currentLocationLatLng variable
+                            LatLng currentLocationLatLng = new LatLng(currLat, currLong);
+                            //Note: fetch signal strength information
+                            int currentRssi = getSignalStrength(act, context);
+
+                            //Note: Add a new marker to the map, and pan camera toward it
+                            MarkerOptions marker = new MarkerOptions().position(currentLocationLatLng).title
+                                    ("rssi: " + currentRssi + "dBm || " + currentLocationLatLng);
+                            //marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.user_location));
+                            //Note: Add a new marker to the map, and pan camera toward it
+                            mMap.addMarker(marker);
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocationLatLng, 18.0f));
+
+                            //Note: Toast to our success
+                            Utility.bakeShortToast("Ping Successful" , context);
+                            //Note: Update our lat, long & rssi trio obj
+                            trioToSubmit[0]=currLat;
+                            trioToSubmit[1]=currLong;
+                            trioToSubmit[2]=currentRssi;
+                            submitUserLATLONGTitle(context,currLat,currLong,currentRssi);
+                        }
+                    }
+                }
+        );
+        return(trioToSubmit);
+    }
+
+
     public static void submitUserLATLONGTitle(Context context, double latitude, double longitude, double rssi){
         Date date = Calendar.getInstance().getTime();
         Calendar calendar = Calendar.getInstance();
@@ -339,6 +392,7 @@ public class Utility extends MapsActivity {
 
     public static void resetDataFromToday(Context context,String mmddyy){
         //Note: Deletes all data from today format "MM/dd/yy
+//        mmddyy = "11/24/21";
         DAOUser dao = new DAOUser();
         dao.clearAllFirebaseDatafromToday(mmddyy);
         bakeShortToast("Firebase Destroyed Successfully",context);
