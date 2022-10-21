@@ -1,24 +1,32 @@
 package com.example.anaximander;
 
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -48,22 +56,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double[] itemsToSubmit;
     private double latitude, longitude;
     private List<WeightedLatLng> latLngsToPlot;
-//    TextView rssiTextView = (TextView) findViewById(R.id.rssiTextView);
+    //    TextView rssiTextView = (TextView) findViewById(R.id.rssiTextView);
     private FusedLocationProviderClient fusedLocationClient;
     private Runnable runnable;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
     private Future longRunningTaskFuture;
     private int stopFlag;
     private Handler handler = new Handler();
-
-
-
+    private Context context;
+    private LocationRequest locationRequest;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 //        TextView rssiTextView = (TextView) findViewById(R.id.rssiTextView);
         super.onCreate(savedInstanceState);
+
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -73,7 +81,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
 //        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+//        fusedLocationClient.requestLocationUpdates(LocationRequest.PRIORITY_HIGH_ACCURACY,
+//                locationCallback,
+//                Looper.getMainLooper());
 
+
+        //uncomment this
+//        context=context = getApplicationContext();
+//        locationRequest = locationRequest.create();
+//        locationRequest.setInterval(100);
+//        locationRequest.setFastestInterval(50);
+//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//        LocationCallback locationCallback = new LocationCallback() {
+//            @Override
+//            public void onLocationResult(LocationResult locationResult) {
+//                if (locationResult != null) {
+//                    if (locationResult == null) {
+//                        return;
+//                    }
+//                    Toast.makeText(act, "location has updated!", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        };
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            return;
+//        }
+//        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
 
 
     }
@@ -88,6 +121,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -97,8 +131,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(home, 17.0f));
         mMap.setMapType(2); //style
 
-        //new
-
+        //as soon as the map is ready, start the location service
+        // we need this to get an accurate location of the user...
+        // this was a tricky concept to realize, as online documentation is not clear about it.
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(100);
+        locationRequest.setFastestInterval(50);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationCallback locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult != null) {
+                    if (locationResult == null) {
+                        return;
+                    }
+//                    Toast.makeText(act, "location has updated!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+        FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
     }
 
 

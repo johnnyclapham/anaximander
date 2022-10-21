@@ -26,16 +26,16 @@
 
             <TextView
                 android:id="@+id/rssiTextView"
-                android:layout_width="1in"
+                android:layout_width="250px"
                 android:layout_height="wrap_content"
-                android:text="RSSI: N/A  "
+                android:text="RSSI: --"
                 android:textColor="@color/black"
                 ></TextView>
             <TextView
                 android:id="@+id/locationAccuracyTextView"
                 android:layout_width="1in"
                 android:layout_height="wrap_content"
-                android:text="Accuracy: N/A "
+                android:text="Accuracy: --"
                 android:textColor="@color/black"
                 ></TextView>
             <Button

@@ -10,6 +10,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.wifi.WifiManager;
+import android.os.Looper;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,7 +19,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -48,6 +51,8 @@ public class Utility extends MapsActivity {
     //Note: Create our obj for transporting lat, long & rssi
     private static double[] trioToSubmit = new double[3];
     private static double[] quadToSubmit = new double[4];
+//    private LocationRequest locationRequest;
+
 
 
     public static void CheckPermissionsTest(Activity activity, Context context) {
@@ -265,6 +270,8 @@ public class Utility extends MapsActivity {
     public static <locationManager> double[] fetchPlotStoreUserData_Fused(Context context, Activity act, GoogleMap mMap) {
         // This is our concept location for improving location accuracy
 
+
+
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(act);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
@@ -272,7 +279,23 @@ public class Utility extends MapsActivity {
                 != PackageManager.PERMISSION_GRANTED) {
             CheckPermissionsTest(act, context);}
 
-
+        //Note: this is working below, we are commenting to see if we can get a better location
+//        LocationRequest locationRequest = LocationRequest.create();
+//        locationRequest.setInterval(100);
+//        locationRequest.setFastestInterval(50);
+//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//        LocationCallback locationCallback = new LocationCallback() {
+//            @Override
+//            public void onLocationResult(LocationResult locationResult) {
+//                if (locationResult != null) {
+//                    if (locationResult == null) {
+//                        return;
+//                    }
+//                    Toast.makeText(act, "location has updated!", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        };
+//        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
 
         CancellationTokenSource cancelToken = new CancellationTokenSource();
         fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,
