@@ -1,28 +1,18 @@
 package com.example.anaximander;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationManager;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -32,7 +22,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.anaximander.databinding.ActivityMapsBinding;
@@ -41,7 +30,6 @@ import com.google.maps.android.heatmaps.WeightedLatLng;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -56,7 +44,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double[] itemsToSubmit;
     private double latitude, longitude;
     private List<WeightedLatLng> latLngsToPlot;
-    //    TextView rssiTextView = (TextView) findViewById(R.id.rssiTextView);
     private FusedLocationProviderClient fusedLocationClient;
     private Runnable runnable;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -69,9 +56,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        TextView rssiTextView = (TextView) findViewById(R.id.rssiTextView);
         super.onCreate(savedInstanceState);
-
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -79,36 +64,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-//        fusedLocationClient.requestLocationUpdates(LocationRequest.PRIORITY_HIGH_ACCURACY,
-//                locationCallback,
-//                Looper.getMainLooper());
-
-
-        //uncomment this
-//        context=context = getApplicationContext();
-//        locationRequest = locationRequest.create();
-//        locationRequest.setInterval(100);
-//        locationRequest.setFastestInterval(50);
-//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//        LocationCallback locationCallback = new LocationCallback() {
-//            @Override
-//            public void onLocationResult(LocationResult locationResult) {
-//                if (locationResult != null) {
-//                    if (locationResult == null) {
-//                        return;
-//                    }
-//                    Toast.makeText(act, "location has updated!", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        };
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            return;
-//        }
-//        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-
-
     }
 
 
@@ -162,10 +117,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             act = this;
             //Note: retrieve our Lat,Long, and rssi
-            // Method 1: use locationManager. This is not recommeded by community.
+            // Method 1: use locationManager. This is not recommeded.
 //            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 //            itemsToSubmit=Utility.fetchPlotStoreUserData_LocationManager(context,act,mMap,locationManager);
-            // Method 2: use fusedLocationClient. This is recommended by community.
+            // Method 2: use fusedLocationClient. This is recommended.
             // Although, we are having difficulties with accuracy of this method.
             itemsToSubmit=Utility.fetchPlotStoreUserData_Fused(context,act,mMap);
 

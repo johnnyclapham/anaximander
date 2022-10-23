@@ -7,21 +7,11 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.wifi.WifiManager;
-import android.os.Looper;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,7 +21,6 @@ import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.CancellationTokenSource;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.maps.android.heatmaps.Gradient;
@@ -45,7 +34,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.concurrent.Executor;
 
 public class Utility extends MapsActivity {
     //Note: Create our obj for transporting lat, long & rssi
@@ -189,82 +177,8 @@ public class Utility extends MapsActivity {
                 //randomRssi = Math.floor(randomRssi);
                 submitUserTestBatch(context, APlat, APlong, randomRssi, index);
             }
-
-
         }
     }
-
-//    public static <locationManager> double[] fetchPlotStoreUserData_LocationManager(Context context, Activity act, GoogleMap mMap, LocationManager locationManager) {
-//        // This is our concept location for improving location accuracy
-//
-////        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-////        CheckPermissionsTest(act, context);
-//        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED
-//                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            CheckPermissionsTest(act, context);
-//        }
-//        Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//        Location locationNETWORK = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-//
-//        Executor mainExecutor = ContextCompat.getMainExecutor(context);
-//
-//
-////        Location currentLocationGPS = locationManager.getCurrentLocation(LocationManager.GPS_PROVIDER, null,null, null);
-////        Location currentLocationNETWORK = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-//
-//        //Note: Create our locationTask that retrieves CURRENT location from a fusedLocationClient
-//        Task<Location> locationTask = Utility.startLocationTask(act,context);
-//        //Note: We have to wait until the task is completed before operating on it
-//        locationTask.addOnCompleteListener(new OnCompleteListener() {
-//            @Override
-//            public void onComplete(@NonNull Task task) {
-//                double currLat,currLong;
-//                LatLng currentLocationLatLng;
-//                int currentRssi;
-//                MarkerOptions marker;
-//                //Note: Retrieve our results
-//                Location currentLocation = (Location) locationTask.getResult();
-//                //Note: Store results in our current Lat & Long variables
-//
-//                //Note: We have three different methods of getting locations
-//                // https://stackoverflow.com/questions/6775257/android-location-providers-gps-or-network-provider
-//                // From my testing, GPS is the most accurate and we are using that
-//
-////                currLat = currentLocation.getLatitude();
-//                currLat = locationGPS.getLatitude();
-////                currLat = locationNETWORK.getLatitude();
-//
-////                currLong= currentLocation.getLongitude();
-//                currLong= locationGPS.getLongitude();
-////                currLong= locationNETWORK.getLongitude();
-//
-//                //Note: Update our currentLocationLatLng variable
-//                currentLocationLatLng = new LatLng(currLat, currLong);
-//                //Note: fetch signal strength information
-//                currentRssi = getSignalStrength(act,context);
-//
-//                //Note: Add a new marker to the map, and pan camera toward it
-//                marker = new MarkerOptions().position(currentLocationLatLng).title
-//                        ("rssi: " + currentRssi +  "dBm || " + currentLocationLatLng);
-//                //marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.user_location));
-//                //Note: Add a new marker to the map, and pan camera toward it
-//                mMap.addMarker(marker);
-//                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocationLatLng, 18.0f));
-//
-//                //Note: Toast to our success
-//                Utility.bakeShortToast("Ping Successful" , context);
-//                //Note: Update our lat, long & rssi trio obj
-//                trioToSubmit[0]=currLat;
-//                trioToSubmit[1]=currLong;
-//                trioToSubmit[2]=currentRssi;
-////                trioToSubmit[3]=0;
-//                submitUserLATLONGTitle(context,currLat,currLong,currentRssi);
-//            }
-//        });
-//        return(trioToSubmit);
-//    }
 
     //Note: this method is more accurate than the above method
     public static <locationManager> double[] fetchPlotStoreUserData_Fused(Context context, Activity act, GoogleMap mMap) {
@@ -279,24 +193,6 @@ public class Utility extends MapsActivity {
                 != PackageManager.PERMISSION_GRANTED) {
             CheckPermissionsTest(act, context);}
 
-        //Note: this is working below, we are commenting to see if we can get a better location
-//        LocationRequest locationRequest = LocationRequest.create();
-//        locationRequest.setInterval(100);
-//        locationRequest.setFastestInterval(50);
-//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//        LocationCallback locationCallback = new LocationCallback() {
-//            @Override
-//            public void onLocationResult(LocationResult locationResult) {
-//                if (locationResult != null) {
-//                    if (locationResult == null) {
-//                        return;
-//                    }
-//                    Toast.makeText(act, "location has updated!", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        };
-//        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-
         CancellationTokenSource cancelToken = new CancellationTokenSource();
         fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,
                 cancelToken.getToken()).addOnSuccessListener(
@@ -308,7 +204,6 @@ public class Utility extends MapsActivity {
                         System.out.println("Location accuracy: " + accuracy);
                         // Note: If the accuracy is rated at 30 or lower (~60% chance of being within 30m)
                         if (location != null && location.hasAccuracy() && location.getAccuracy()<30) {
-//                            System.out.println("Location: " + location);
                             double currLat = location.getLatitude();
                             double currLong = location.getLongitude();
 
@@ -332,9 +227,6 @@ public class Utility extends MapsActivity {
                             quadToSubmit[2]=currentRssi;
                             quadToSubmit[3]=accuracy;
 
-                            //Note: Update accuracy text & submit
-//                            TextView locAccuracyTextView = (TextView) findViewById(R.id.locationAccuracyTextView);
-//                            locAccuracyTextView.setText("Location Accuracy: " + accuracy);
                             submitUserLATLONGTitle(context,currLat,currLong,currentRssi);
 
                         }
@@ -367,7 +259,6 @@ public class Utility extends MapsActivity {
         String childTitleLAT = floatingPartAsStringLAT.substring(indexOfDecimalLAT+1,indexOfDecimalLAT+6);
         String childTitleLONG = floatingPartAsStringLONG.substring(indexOfDecimalLONG+1,indexOfDecimalLONG+6);
         String childTitleLATLONG = childTitleLAT + childTitleLONG;
-        //String childTitleLATLONG = childTitleLONG;
 
         // Note: since the name of the record is the LATLONG, any duplicates will overwrite the
         // last entry.
@@ -402,7 +293,6 @@ public class Utility extends MapsActivity {
         User userForStoring = new User(latitude,longitude,rssi,android.os.Build.MODEL, date,format);
         dao.addWithTimeStampChildName(userForStoring,Integer.toString(index)).addOnSuccessListener(suc ->{
             System.out.println("Record is inserted");
-            //bakeShortToast("Record is inserted",context);
         }).addOnFailureListener(er->{
             bakeShortToast(""+er.getMessage(),context);
         });
