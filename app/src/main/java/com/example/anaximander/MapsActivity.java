@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -193,7 +194,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //      make a marker on the map for each
             //Note: We pass an array twice the size of the verbose array
             //      This is because there are LatLong pairs for each
-            Utility.extractAndPlotCoords(context,coordsArraySet,mMap);
+            // TODO: Uncomment if the simulation data is needed
+//            Utility.extractAndPlotCoords(context,coordsArraySet,mMap);
+//            Toast.makeText(context, "currently disabled", Toast.LENGTH_SHORT).show();
         } else if(view.getId() == R.id.clear_button){
             mMap.clear();
         //} else if(view.getId() == R.id.store_button){

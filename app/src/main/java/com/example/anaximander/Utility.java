@@ -331,6 +331,8 @@ public class Utility extends MapsActivity {
 //        mmddyy = "12/09/21";
         DAOUser dao = new DAOUser();
         dao.clearAllFirebaseDatafromToday(mmddyy);
+        //The line below will delete all data from the database
+//        dao.clearTestData();
         bakeShortToast("Firebase Destroyed Successfully",context);
     }
 

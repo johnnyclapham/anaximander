@@ -60,6 +60,29 @@ public class DAOUser {
         });
     }
 
+    public void clearTestData() {
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        Query thirtyQuery = ref.child("User");
+
+        thirtyQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot appleSnapshot : dataSnapshot.getChildren()) {
+                    if (appleSnapshot.getKey().length()<5) {
+                        appleSnapshot.getRef().removeValue();
+                    }
+                    appleSnapshot.getRef().removeValue();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, "onCancelled", databaseError.toException());
+            }
+        });
+    }
+
     public List<WeightedLatLng> getAllFireBaseLatLngs(){
         List<WeightedLatLng> WeightedLatLng = new ArrayList<>();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
